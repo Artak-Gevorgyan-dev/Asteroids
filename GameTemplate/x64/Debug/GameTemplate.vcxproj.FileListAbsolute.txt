@@ -1,0 +1,2 @@
+C:\Users\garta\Desktop\GameTemplate\x64\Debug\GameTemplate.exe
+C:\Users\garta\Desktop\GameTemplate\x64\Debug\GameTemplate.pdb

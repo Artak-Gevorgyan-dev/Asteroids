@@ -1,0 +1,9 @@
+﻿  Game.cpp
+C:\Users\garta\Desktop\GameTemplate\Game.cpp(46,20): warning C4244: '+=': conversion from 'float' to 'int', possible loss of data
+C:\Users\garta\Desktop\GameTemplate\Game.cpp(55,19): warning C4244: '-=': conversion from 'float' to 'int', possible loss of data
+C:\Users\garta\Desktop\GameTemplate\Game.cpp(99,17): warning C4244: 'initializing': conversion from 'double' to 'size_t', possible loss of data
+C:\Users\garta\Desktop\GameTemplate\Game.cpp(101,22): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\garta\Desktop\GameTemplate\Game.cpp(102,22): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\garta\Desktop\GameTemplate\Game.cpp(116,33): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\garta\Desktop\GameTemplate\Game.cpp(117,33): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  GameTemplate.vcxproj -> C:\Users\garta\Desktop\GameTemplate\x64\Debug\GameTemplate.exe
