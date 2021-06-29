@@ -24,9 +24,10 @@ using namespace std;
 void drawSquare(int size, int pointX, int pointY);
 int clamp(int value, int min, int max);
 void drawTriangle(int size, int pointX, int pointY);
+void drawline(int x0, int y0, int x1, int y1, uint32_t color);
 
-int shipX = 0;
-int shipY = 0;
+float shipX = 0;
+float shipY = 0;
 int a = 500;
 
 // initialize game data in this function
@@ -36,6 +37,8 @@ void initialize()
 	shipX = SCREEN_HEIGHT / 2;
 }
 
+
+
 // this function is called to update game data,
 // dt - time elapsed since the previous update (in seconds)
 void act(float dt)
@@ -43,24 +46,12 @@ void act(float dt)
   if (is_key_pressed(VK_ESCAPE))
     schedule_quit_game();
   if (is_key_pressed(VK_DOWN)) {
-	  a += (1.0f * dt);
-	  wchar_t buffer[256];
-	  wsprintfW(buffer, L"DOWN %d\n", (1.0f * dt));
 
-	  LPCWSTR debug = buffer;
-	  OutputDebugStringW(debug);
-  }
-
-  if (is_key_pressed(VK_UP)) {
-	  a -= (1.0f* dt);
-
-	  wchar_t buffer[256];
-
-
-	  wsprintfW(buffer, L"UP %d\n", (1.0f * dt));
-
-
-	  OutputDebugStringW(buffer);
+	  shipX += 100 * dt;
+	  cout << "a";
+  }else if (is_key_pressed(VK_UP)) {
+	  shipX -= 100 * dt;
+	  cout << "a";
   }
 
 
@@ -74,12 +65,22 @@ void draw()
   // clear backbuffer
   memset(buffer, 0, SCREEN_HEIGHT * SCREEN_WIDTH * sizeof(uint32_t));
   //drawSquare(100, SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2);
-  drawTriangle(30, a,shipY);
+  drawTriangle(30, shipX,shipY);
   if (is_mouse_button_pressed(0)) {
 	  //drawSquare(100, get_cursor_y(), get_cursor_x());
 	  
   }
 }
+
+
+
+//wchar_t buffer[256];
+//
+//
+//wsprintfW(buffer, L"UP %d\n", (1.0f * dt));
+//
+//
+//OutputDebugStringW(buffer);
 
 // free game data in this function
 void finalize()
@@ -96,17 +97,21 @@ int clamp(int value, int min, int max) {
 }
 
 void drawTriangle(int size,int pointX,int pointY) {
-	for (size_t i = 0; i < size; i++)
-	{
-		for (size_t j = (size/2)-i/2.5; j < size / 2+i/2.5; j++)
-		{
-			int x = i + pointX;
-			int y = j + pointY;
-			x = clamp(x, 0, SCREEN_HEIGHT);
-			y = clamp(y, 0, SCREEN_WIDTH);
-			buffer[x][y] = 0xFF0000;
-		}
-	}
+//	for (size_t i = 0; i < size; i++)
+//	{
+//		for (size_t j = (size/2)-i/2.5; j < size / 2+i/2.5; j++)
+//		{
+//			int x = i + pointX;
+//			int y = j + pointY;
+//			x = clamp(x, 0, SCREEN_HEIGHT);
+//			y = clamp(y, 0, SCREEN_WIDTH);
+//			buffer[x][y] = 0xFF0000;
+//		}
+//	}
+	drawline(0, 0, 0, 100, 0xFF0000);
+	drawline(0,100,100,100, 0x00FF00);
+	drawline(0,0,100,100, 0x0000FF);
+	//drawline(100, 0, 100, 100, 0x0000FF);
 }
 
 void drawSquare(int size, int pointX, int pointY) {
@@ -129,4 +134,32 @@ void drawSquare(int size, int pointX, int pointY) {
 		}
 	}
 }
+void drawline(int x0, int y0, int x1, int y1, uint32_t color)
+{
+	int dx, dy, p, x, y;
 
+	dx = x1 - x0;
+	dy = y1 - y0;
+
+	x = x0;
+	y = y0;
+
+	p = 2 * dy - dx;
+
+	while (x < x1 || y< y1)
+	{
+		if (p >= 0)
+		{
+			buffer[x][y] = color;
+			y = y + 1;
+			p = p + 2 * dy - 2 * dx;
+		}
+		else
+		{
+			buffer[x][y] = color;
+			p = p + 2 * dy;
+		}
+		if(dx !=0 )
+			x = x + 1;
+	}
+}
