@@ -5,6 +5,7 @@
 #include <string>  
 //#include <debugapi.h>
 #include <windows.h>
+#include <math.h>
 
 //
 //  You are free to modify this file
@@ -24,7 +25,7 @@ using namespace std;
 void drawSquare(int size, int pointX, int pointY);
 int clamp(int value, int min, int max);
 void drawTriangle(int size, int pointX, int pointY);
-void drawline(int x0, int y0, int x1, int y1, uint32_t color);
+void drawline(int X0, int Y0, int X1, int Y1, uint32_t color);
 
 float shipX = 0;
 float shipY = 0;
@@ -108,9 +109,10 @@ void drawTriangle(int size,int pointX,int pointY) {
 //			buffer[x][y] = 0xFF0000;
 //		}
 //	}
-	drawline(0, 0, 0, 100, 0xFF0000);
-	drawline(0,100,100,100, 0x00FF00);
-	drawline(0,0,100,100, 0x0000FF);
+	drawline(0, 33/2, 0, 66/2, 0xFF0000);
+	drawline(50/2,48/2,0,33/2, 0x00FF00);
+	drawline(50/2, 48/2, 0, 66/2, 0x00FF00);
+	//drawline(100,50,0,100, 0x0000FF);
 	//drawline(100, 0, 100, 100, 0x0000FF);
 }
 
@@ -134,32 +136,56 @@ void drawSquare(int size, int pointX, int pointY) {
 		}
 	}
 }
-void drawline(int x0, int y0, int x1, int y1, uint32_t color)
+void drawline(int X0, int Y0, int X1, int Y1, uint32_t color)
 {
-	int dx, dy, p, x, y;
+	int dx = X1 - X0;
+	int dy = Y1 - Y0;
 
-	dx = x1 - x0;
-	dy = y1 - y0;
+	// calculate steps required for generating pixels
+	int steps = abs(dx) > abs(dy) ? abs(dx) : abs(dy);
 
-	x = x0;
-	y = y0;
+	// calculate increment in x & y for each steps
+	float Xinc = dx / (float)steps;
+	float Yinc = dy / (float)steps;
 
-	p = 2 * dy - dx;
-
-	while (x < x1 || y< y1)
+	// Put pixel for each step
+	float X = X0;
+	float Y = Y0;
+	for (int i = 0; i <= steps; i++)
 	{
-		if (p >= 0)
-		{
-			buffer[x][y] = color;
-			y = y + 1;
-			p = p + 2 * dy - 2 * dx;
-		}
-		else
-		{
-			buffer[x][y] = color;
-			p = p + 2 * dy;
-		}
-		if(dx !=0 )
-			x = x + 1;
+		buffer[(int)round(X)][(int)round(Y)] = color;  // put pixel at (X,Y)
+		X += Xinc;           // increment in x at each step
+		Y += Yinc;           // increment in y at each step							 // generation step by step
 	}
+
+
+
+
+
+	//int dx, dy, p, x, y;
+
+	//dx = x1 - x0;
+	//dy = y1 - y0;
+
+	//x = x0;
+	//y = y0;
+
+	//p = 2 * dy - dx;
+
+	//while (x < x1 || y< y1)
+	//{
+	//	if (p >= 0)
+	//	{
+	//		buffer[x][y] = color;
+	//		y = y + 1;
+	//		p = p + 2 * dy - 2 * dx;
+	//	}
+	//	else
+	//	{
+	//		buffer[x][y] = color;
+	//		p = p + 2 * dy;
+	//	}
+	//	if(dx !=0 )
+	//		x = x + 1;
+	//}
 }
