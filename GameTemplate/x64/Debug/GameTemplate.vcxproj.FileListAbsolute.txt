@@ -1,3 +1,5 @@
 C:\Users\garta\Desktop\GameTemplate\x64\Debug\GameTemplate.exe
 C:\Users\garta\Desktop\GameTemplate\x64\Debug\GameTemplate.pdb
 D:\Asteroids\GameTemplate\x64\Debug\GameTemplate.exe
+D:\GitHub\Asteroids\GameTemplate\x64\Debug\GameTemplate.exe
+D:\GitHub\Asteroids\GameTemplate\x64\Debug\GameTemplate.pdb

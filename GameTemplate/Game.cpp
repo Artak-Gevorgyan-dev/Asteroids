@@ -66,9 +66,10 @@ void draw()
   // clear backbuffer
   memset(buffer, 0, SCREEN_HEIGHT * SCREEN_WIDTH * sizeof(uint32_t));
   //drawSquare(100, SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2);
-  drawTriangle(30, shipX,shipY);
-  if (is_mouse_button_pressed(0)) {
-	  //drawSquare(100, get_cursor_y(), get_cursor_x());
+  drawTriangle(10, shipX,shipY);
+  if (is_mouse_button_pressed(0)) 
+  {
+	  drawSquare(100, get_cursor_y(), get_cursor_x());
 	  
   }
 }
@@ -109,9 +110,14 @@ void drawTriangle(int size,int pointX,int pointY) {
 //			buffer[x][y] = 0xFF0000;
 //		}
 //	}
-	drawline(0, 33/2, 0, 66/2, 0xFF0000);
-	drawline(50/2,48/2,0,33/2, 0x00FF00);
-	drawline(50/2, 48/2, 0, 66/2, 0x00FF00);
+	//drawline(0, 33/2, 0, 66/2, 0xFF0000);
+	//drawline(50/2,48/2,0,33/2, 0x00FF00);
+	//drawline(50/2, 48/2, 0, 66/2, 0x00FF00);
+
+	drawline(6 * size + pointX, 1 * size + pointY, 6 * size + pointX, 3 * size + pointY, 0xFF0000);
+	drawline(6 * size + pointX, 1 * size + pointY, 2 * size + pointX, 2 * size + pointY, 0x00FF00);
+	drawline(2 * size + pointX, 2 * size + pointY, 6 * size + pointX, 3 * size + pointY, 0xFFFF00);
+	
 	//drawline(100,50,0,100, 0x0000FF);
 	//drawline(100, 0, 100, 100, 0x0000FF);
 }
@@ -157,10 +163,6 @@ void drawline(int X0, int Y0, int X1, int Y1, uint32_t color)
 		X += Xinc;           // increment in x at each step
 		Y += Yinc;           // increment in y at each step							 // generation step by step
 	}
-
-
-
-
 
 	//int dx, dy, p, x, y;
 
