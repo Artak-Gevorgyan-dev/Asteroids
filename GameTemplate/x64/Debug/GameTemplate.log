@@ -1,8 +1,9 @@
 ﻿  Game.cpp
-D:\GitHub\Asteroids\GameTemplate\Game.cpp(69,26): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-D:\GitHub\Asteroids\GameTemplate\Game.cpp(69,20): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-D:\GitHub\Asteroids\GameTemplate\Game.cpp(131,33): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-D:\GitHub\Asteroids\GameTemplate\Game.cpp(132,33): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-D:\GitHub\Asteroids\GameTemplate\Game.cpp(158,10): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-D:\GitHub\Asteroids\GameTemplate\Game.cpp(159,10): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-  GameTemplate.vcxproj -> D:\GitHub\Asteroids\GameTemplate\x64\Debug\GameTemplate.exe
+D:\Asteroids\GameTemplate\Game.cpp(70,35): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+D:\Asteroids\GameTemplate\Game.cpp(70,29): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+D:\Asteroids\GameTemplate\Game.cpp(122,10): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+D:\Asteroids\GameTemplate\Game.cpp(147,33): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+D:\Asteroids\GameTemplate\Game.cpp(148,33): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+D:\Asteroids\GameTemplate\Game.cpp(174,10): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+D:\Asteroids\GameTemplate\Game.cpp(175,10): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+  GameTemplate.vcxproj -> D:\Asteroids\GameTemplate\x64\Debug\GameTemplate.exe

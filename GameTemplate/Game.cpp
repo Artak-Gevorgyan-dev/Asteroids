@@ -6,6 +6,7 @@
 //#include <debugapi.h>
 #include <windows.h>
 #include <math.h>
+#include "Vector2.h"
 
 //
 //  You are free to modify this file
@@ -24,7 +25,7 @@ using namespace std;
 
 void drawSquare(int size, int pointX, int pointY);
 int clamp(int value, int min, int max);
-void drawTriangle(int size, int pointX, int pointY);
+void drawTriangle(int size, Vector2 point);
 void drawline(int X0, int Y0, int X1, int Y1, uint32_t color);
 
 float shipX = 0;
@@ -66,7 +67,7 @@ void draw()
   // clear backbuffer
   memset(buffer, 0, SCREEN_HEIGHT * SCREEN_WIDTH * sizeof(uint32_t));
   //drawSquare(100, SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2);
-  drawTriangle(10, shipX,shipY);
+  drawTriangle(10,  Vector2(shipX,shipY));
   if (is_mouse_button_pressed(0)) 
   {
 	  drawSquare(100, get_cursor_y(), get_cursor_x());
@@ -98,7 +99,7 @@ int clamp(int value, int min, int max) {
 	return value;
 }
 
-void drawTriangle(int size,int pointX,int pointY) {
+void drawTriangle(int size,Vector2 point) {
 //	for (size_t i = 0; i < size; i++)
 //	{
 //		for (size_t j = (size/2)-i/2.5; j < size / 2+i/2.5; j++)
@@ -114,10 +115,25 @@ void drawTriangle(int size,int pointX,int pointY) {
 	//drawline(50/2,48/2,0,33/2, 0x00FF00);
 	//drawline(50/2, 48/2, 0, 66/2, 0x00FF00);
 
-	drawline(6 * size + pointX, 1 * size + pointY, 6 * size + pointX, 3 * size + pointY, 0xFF0000);
-	drawline(6 * size + pointX, 1 * size + pointY, 2 * size + pointX, 2 * size + pointY, 0x00FF00);
-	drawline(2 * size + pointX, 2 * size + pointY, 6 * size + pointX, 3 * size + pointY, 0xFFFF00);
+	Vector2 point2 = Vector2(point.x , point.y + 50);
+
+	Vector2 direction = point2 - point;
+
+	float m =-(direction.x/direction.y);
+
+	float b = m * point.x + point.y;
+	buffer[point.x][point.y] = 0x00FF00;
+	drawline(6 * size + point.x, 1 * size + point.y, 6 * size + point.x, 3 * size + point.y, 0xFF0000);
+	drawline(6 * size + point.x, 1 * size + point.y, 2 * size + point.x, 2 * size + point.y, 0x00FF00);
+	drawline(2 * size + point.x, 2 * size + point.y, 6 * size + point.x, 3 * size + point.y, 0xFFFF00);
 	
+	Vector2 dzakhnerqev = Vector2(6 * size + point.x, 1 * size + point.y);
+	Vector2 ajnerqev = Vector2(6 * size + point.x, 3 * size + point.y);
+
+	Vector2 mid = ajnerqev + (dzakhnerqev - ajnerqev)/2;
+
+	buffer[mid.x][mid.y] = 0xFFFFFF;
+
 	//drawline(100,50,0,100, 0x0000FF);
 	//drawline(100, 0, 100, 100, 0x0000FF);
 }
