@@ -26,11 +26,13 @@ using namespace std;
 void drawSquare(int size, int pointX, int pointY);
 int clamp(int value, int min, int max);
 void drawTriangle(int size, Vector2 point);
-void drawline(int X0, int Y0, int X1, int Y1, uint32_t color);
+void drawline(Vector2 point, Vector2 point2, uint32_t color);
+Vector2 rotateRound(Vector2 point, Vector2 pivot, float angle);
 
 float shipX = 0;
 float shipY = 0;
 int a = 500;
+float shipAngle=1;
 
 // initialize game data in this function
 void initialize()
@@ -50,12 +52,16 @@ void act(float dt)
   if (is_key_pressed(VK_DOWN)) {
 
 	  shipX += 100 * dt;
-	  cout << "a";
   }else if (is_key_pressed(VK_UP)) {
 	  shipX -= 100 * dt;
-	  cout << "a";
   }
+  if (is_key_pressed(VK_RIGHT)) {
 
+	  shipAngle -= 5 * dt;
+  }
+  else if (is_key_pressed(VK_LEFT)) {
+	  shipAngle += 5 * dt;
+  }
 
 }
 
@@ -123,20 +129,63 @@ void drawTriangle(int size,Vector2 point) {
 
 	float b = m * point.x + point.y;
 	buffer[point.x][point.y] = 0x00FF00;
-	drawline(6 * size + point.x, 1 * size + point.y, 6 * size + point.x, 3 * size + point.y, 0xFF0000);
-	drawline(6 * size + point.x, 1 * size + point.y, 2 * size + point.x, 2 * size + point.y, 0x00FF00);
-	drawline(2 * size + point.x, 2 * size + point.y, 6 * size + point.x, 3 * size + point.y, 0xFFFF00);
-	
-	Vector2 dzakhnerqev = Vector2(6 * size + point.x, 1 * size + point.y);
-	Vector2 ajnerqev = Vector2(6 * size + point.x, 3 * size + point.y);
 
-	Vector2 mid = ajnerqev + (dzakhnerqev - ajnerqev)/2;
+	Vector2 right = Vector2(6 * size + point.x, 3 * size + point.y);
+	Vector2 left  = Vector2(6 * size + point.x, 1 * size + point.y);
+	Vector2 upper = Vector2(2 * size + point.x, 2 * size + point.y);
+	Vector2 mid = right + (left - right) / 2;
+
+	right = rotateRound(right, mid, shipAngle);
+	  left = rotateRound(left, mid, shipAngle);
+	upper = rotateRound(upper, mid, shipAngle);
+
+	drawline(left, right, 0xFF0000);
+	drawline(left, upper, 0x00FF00);
+	drawline(upper, right, 0xFFFF00);
+	
+
+
+
+
+
+	
+	buffer[upper.x][upper.y] = 0xFFFFFF;
+	//buffer[upper.x+1][upper.y+1] = 0xFFFFFF;
+	//buffer[upper.x-1][upper.y-1] = 0xFFFFFF;
+	//buffer[upper.x+1][upper.y-1] = 0xFFFFFF;
+	//buffer[upper.x-1][upper.y+1] = 0xFFFFFF;
+	//buffer[upper.x][upper.y+1] = 0xFFFFFF;
+	//buffer[upper.x+1][upper.y] = 0xFFFFFF;
+	//buffer[upper.x][upper.y-1] = 0xFFFFFF;
+	//buffer[upper.x-1][upper.y] = 0xFFFFFF;
 
 	buffer[mid.x][mid.y] = 0xFFFFFF;
 
+	Vector2 forwardDir = upper - mid;
 	//drawline(100,50,0,100, 0x0000FF);
 	//drawline(100, 0, 100, 100, 0x0000FF);
 }
+
+Vector2 rotateRound(Vector2 point, Vector2 pivot, float angle) {
+	//int x_rotated = ((point.x - pivot.x) * cos(angle)) - ((pivot.y - point.y) * sin(angle)) + pivot.x;
+	//int y_rotated = pivot.y - ((pivot.y - point.y) * cos(angle)) + ((point.x - pivot.x) * sin(angle));
+	Vector2 finalPoint;
+	float s = sin(angle);
+	float c = cos(angle);
+
+	finalPoint.x = point.x - pivot.x;
+	finalPoint.y = point.y - pivot.y;
+
+	float xnew = finalPoint.x * c - finalPoint.y * s;
+	float ynew = finalPoint.x * s + finalPoint.y * c;
+
+	finalPoint.x = xnew + pivot.x;
+	finalPoint.y = ynew + pivot.y;
+	
+	
+	return finalPoint;
+}
+
 
 void drawSquare(int size, int pointX, int pointY) {
 	for (size_t i = 0; i < size; i++)
@@ -158,10 +207,10 @@ void drawSquare(int size, int pointX, int pointY) {
 		}
 	}
 }
-void drawline(int X0, int Y0, int X1, int Y1, uint32_t color)
+void drawline(Vector2 point, Vector2 point2, uint32_t color)
 {
-	int dx = X1 - X0;
-	int dy = Y1 - Y0;
+	int dx = point2.x - point.x;
+	int dy = point2.y - point.y;
 
 	// calculate steps required for generating pixels
 	int steps = abs(dx) > abs(dy) ? abs(dx) : abs(dy);
@@ -171,8 +220,8 @@ void drawline(int X0, int Y0, int X1, int Y1, uint32_t color)
 	float Yinc = dy / (float)steps;
 
 	// Put pixel for each step
-	float X = X0;
-	float Y = Y0;
+	float X = point.x;
+	float Y = point.y;
 	for (int i = 0; i <= steps; i++)
 	{
 		buffer[(int)round(X)][(int)round(Y)] = color;  // put pixel at (X,Y)
