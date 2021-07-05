@@ -1,4 +1,5 @@
 #include "Vector2.h"
+#include <math.h>
 
 Vector2::Vector2(int x, int y) {
 	this->x = x;
@@ -26,3 +27,10 @@ Vector2 Vector2::operator / (const float& other) {
 	tempVec.y = this->y / other;
 	return tempVec;
 }
+void Vector2::normalize()
+{
+	float lenght =sqrt(this->x* this->x + this->y * this->y);
+	this->x = this->x / lenght;
+	this->y = this->y / lenght;
+}
+

@@ -32,7 +32,11 @@ Vector2 rotateRound(Vector2 point, Vector2 pivot, float angle);
 float shipX = 0;
 float shipY = 0;
 int a = 500;
-float shipAngle=1;
+float shipAngle=0;
+float speed=0;
+Vector2 forwardDir = Vector2();
+Vector2 currentforwardDir = Vector2();
+
 
 // initialize game data in this function
 void initialize()
@@ -40,6 +44,7 @@ void initialize()
 	shipY = SCREEN_WIDTH / 2;
 	shipX = SCREEN_HEIGHT / 2;
 }
+
 
 
 
@@ -51,9 +56,13 @@ void act(float dt)
     schedule_quit_game();
   if (is_key_pressed(VK_DOWN)) {
 
-	  shipX += 100 * dt;
+	  speed -= 0.001 * dt;
   }else if (is_key_pressed(VK_UP)) {
-	  shipX -= 100 * dt;
+	  forwardDir.normalize();
+	  currentforwardDir = forwardDir+ currentforwardDir;
+	  currentforwardDir.normalize();
+
+	  speed += 1 * dt;
   }
   if (is_key_pressed(VK_RIGHT)) {
 
@@ -62,7 +71,8 @@ void act(float dt)
   else if (is_key_pressed(VK_LEFT)) {
 	  shipAngle += 5 * dt;
   }
-
+  shipX += speed * currentforwardDir.x;
+  shipY += speed * currentforwardDir.y;
 }
 
 
@@ -105,6 +115,12 @@ int clamp(int value, int min, int max) {
 	return value;
 }
 
+void SetPixel(int x, int y, uint32_t color) {
+	x = clamp(x, 0, SCREEN_HEIGHT);
+	y = clamp(y, 0, SCREEN_WIDTH);
+	buffer[x][y] = color;
+}
+
 void drawTriangle(int size,Vector2 point) {
 //	for (size_t i = 0; i < size; i++)
 //	{
@@ -128,7 +144,7 @@ void drawTriangle(int size,Vector2 point) {
 	float m =-(direction.x/direction.y);
 
 	float b = m * point.x + point.y;
-	buffer[point.x][point.y] = 0x00FF00;
+//	buffer[point.x][point.y] = 0x00FF00;
 
 	Vector2 right = Vector2(6 * size + point.x, 3 * size + point.y);
 	Vector2 left  = Vector2(6 * size + point.x, 1 * size + point.y);
@@ -142,28 +158,12 @@ void drawTriangle(int size,Vector2 point) {
 	drawline(left, right, 0xFF0000);
 	drawline(left, upper, 0x00FF00);
 	drawline(upper, right, 0xFFFF00);
-	
 
+	SetPixel(upper.x, upper.y, 0xFFFFFF);
 
+	SetPixel(mid.x, mid.y, 0xFFFFFF);
+	forwardDir = upper - mid;
 
-
-
-	
-	buffer[upper.x][upper.y] = 0xFFFFFF;
-	//buffer[upper.x+1][upper.y+1] = 0xFFFFFF;
-	//buffer[upper.x-1][upper.y-1] = 0xFFFFFF;
-	//buffer[upper.x+1][upper.y-1] = 0xFFFFFF;
-	//buffer[upper.x-1][upper.y+1] = 0xFFFFFF;
-	//buffer[upper.x][upper.y+1] = 0xFFFFFF;
-	//buffer[upper.x+1][upper.y] = 0xFFFFFF;
-	//buffer[upper.x][upper.y-1] = 0xFFFFFF;
-	//buffer[upper.x-1][upper.y] = 0xFFFFFF;
-
-	buffer[mid.x][mid.y] = 0xFFFFFF;
-
-	Vector2 forwardDir = upper - mid;
-	//drawline(100,50,0,100, 0x0000FF);
-	//drawline(100, 0, 100, 100, 0x0000FF);
 }
 
 Vector2 rotateRound(Vector2 point, Vector2 pivot, float angle) {
@@ -198,7 +198,7 @@ void drawSquare(int size, int pointX, int pointY) {
 			x = clamp(x, 0, SCREEN_HEIGHT);
 			y = clamp(y, 0, SCREEN_WIDTH);
 			try {
-				buffer[x][y] = 0xFF0000;
+				SetPixel(x, y, 0xFF0000);
 			}
 			catch (...) {
 
@@ -224,7 +224,11 @@ void drawline(Vector2 point, Vector2 point2, uint32_t color)
 	float Y = point.y;
 	for (int i = 0; i <= steps; i++)
 	{
-		buffer[(int)round(X)][(int)round(Y)] = color;  // put pixel at (X,Y)
+
+
+		SetPixel((int)round(X), (int)round(Y), color);
+		//buffer[a][b] = color;  // put pixel at (X,Y)
+
 		X += Xinc;           // increment in x at each step
 		Y += Yinc;           // increment in y at each step							 // generation step by step
 	}
