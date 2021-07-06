@@ -7,6 +7,7 @@
 #include <windows.h>
 #include <math.h>
 #include "Vector2.h"
+#include "Bullet.h"
 
 //
 //  You are free to modify this file
@@ -30,6 +31,7 @@ void drawline(Vector2 point, Vector2 point2, uint32_t color);
 Vector2 rotateRound(Vector2 point, Vector2 pivot, float angle);
 void thrusterFlame(int size, Vector2 point);
 void setPixel(int x, int y, uint32_t color);
+void shoot();
 
 
 float shipX = 0;
@@ -40,6 +42,8 @@ float speed=0;
 Vector2 forwardDir = Vector2();
 Vector2 currentforwardDir = Vector2();
 Vector2 shipMid = Vector2();
+Bullet bullet;
+
 
 // initialize game data in this function
 void initialize()
@@ -93,6 +97,22 @@ void draw()
   if (is_key_pressed(VK_UP)) {
 	  thrusterFlame(10, shipMid);
   }
+  if (is_key_pressed(VK_SPACE)) {
+	  shoot();
+  }
+  if (&bullet != NULL) {
+	  cout << "a";
+	  bullet.position.x+= 0.01 * bullet.direction.x;
+	  bullet.position.y += 0.01 * bullet.direction.y;
+	  drawSquare(5, bullet.direction.x + bullet.position.x, bullet.direction.y + bullet.position.y);
+  }
+}
+
+void shoot() {
+	bullet = Bullet();
+	bullet.direction = forwardDir;
+	bullet.position = shipMid;
+	
 }
 
 // free game data in this function
