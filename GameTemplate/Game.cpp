@@ -8,6 +8,7 @@
 #include <math.h>
 #include "Vector2.h"
 #include "Bullet.h"
+#include <vector>
 
 //
 //  You are free to modify this file
@@ -32,6 +33,7 @@ Vector2 rotateRound(Vector2 point, Vector2 pivot, float angle);
 void thrusterFlame(int size, Vector2 point);
 void setPixel(int x, int y, uint32_t color);
 void shoot();
+bool OnButtonDown(int button);
 
 
 float shipX = 0;
@@ -42,7 +44,7 @@ float speed=0;
 Vector2 forwardDir = Vector2();
 Vector2 currentforwardDir = Vector2();
 Vector2 shipMid = Vector2();
-Bullet bullet;
+vector<Bullet*> shootedBullets;
 
 
 // initialize game data in this function
@@ -50,6 +52,7 @@ void initialize()
 {
 	shipY = SCREEN_WIDTH / 2;
 	shipX = SCREEN_HEIGHT / 2;
+	
 }
 
 
@@ -64,7 +67,7 @@ void act(float dt)
 	if (is_key_pressed(VK_UP)) {
 	  //forwardDir.normalize();
 	  currentforwardDir = forwardDir+ currentforwardDir;
-	  //currentforwardDir.normalize();
+	 // currentforwardDir.normalize();
 	  
 	  speed = 0.01 * dt;
 	 
@@ -97,22 +100,43 @@ void draw()
   if (is_key_pressed(VK_UP)) {
 	  thrusterFlame(10, shipMid);
   }
-  if (is_key_pressed(VK_SPACE)) {
+  if (OnButtonDown(VK_SPACE)) {
 	  shoot();
   }
-  if (&bullet != NULL) {
-	  cout << "a";
-	  bullet.position.x+= 0.01 * bullet.direction.x;
-	  bullet.position.y += 0.01 * bullet.direction.y;
-	  drawSquare(5, bullet.direction.x + bullet.position.x, bullet.direction.y + bullet.position.y);
+
+  for (auto bullet : shootedBullets) {
+	  bullet->position.x += 0.01 * bullet->direction.x;
+	  bullet->position.y += 0.01 * bullet->direction.y;
+	  drawSquare(5, bullet->direction.x + bullet->position.x, bullet->direction.y + bullet->position.y);
   }
+
+}
+bool previousPress = false;
+bool pressed = false;
+
+bool OnButtonDown(int button)
+{
+	pressed = is_key_pressed(button);
+	if (previousPress != pressed)
+	{
+		previousPress = pressed;
+		if (pressed)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void shoot() {
-	bullet = Bullet();
-	bullet.direction = forwardDir;
-	bullet.position = shipMid;
 	
+	auto bullet = new Bullet();
+	bullet->direction = forwardDir;
+	bullet->position = shipMid;
+	shootedBullets.emplace_back(bullet);
+
+	//delete bullet;
 }
 
 // free game data in this function
