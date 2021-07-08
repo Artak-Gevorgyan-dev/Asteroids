@@ -40,11 +40,11 @@ float shipX = 0;
 float shipY = 0;
 int a = 500;
 float shipAngle=0;
-float speed=0;
+float speed= 0.01;
 Vector2 forwardDir = Vector2();
 Vector2 currentforwardDir = Vector2();
 Vector2 shipMid = Vector2();
-vector<Bullet*> shootedBullets;
+vector<Bullet*> shootedBullets = vector<Bullet*>();
 
 
 // initialize game data in this function
@@ -64,24 +64,52 @@ void act(float dt)
 {
   if (is_key_pressed(VK_ESCAPE))
     schedule_quit_game();
-	if (is_key_pressed(VK_UP)) {
-	  //forwardDir.normalize();
-	  currentforwardDir = forwardDir+ currentforwardDir;
-	 // currentforwardDir.normalize();
-	  
-	  speed = 0.01 * dt;
-	 
-  }
+  if (is_key_pressed(VK_UP)) {
+	  // forwardDir.normalize();
+ 	  currentforwardDir = forwardDir + currentforwardDir;
+	  // currentforwardDir.normalize();
+
+	
+
+  } 
   if (is_key_pressed(VK_RIGHT)) {
 
-	  shipAngle -= 5 * dt;
-  }
-  else if (is_key_pressed(VK_LEFT)) {
+ 	  shipAngle -= 5 * dt;
+  }else if (is_key_pressed(VK_LEFT)) {
 	  shipAngle += 5 * dt;
   }
-  shipX += speed * currentforwardDir.x;
-  shipY += speed * currentforwardDir.y;
+  if (OnButtonDown('A')) {
+	//  shoot();
+	  cout << "a";
+		
+  }
+    
+  shipX += speed * dt * currentforwardDir.x;
+  shipY += speed * dt * currentforwardDir.y;
+
+  for (int i = 0;i< shootedBullets.size(); i++) {
+
+	  if (shootedBullets[i]->needToDestroy(dt)) {
+
+  		  shootedBullets[i]->time;
+
+		  //delete &shootedBullets[i];
+
+		
+
+		  //shootedBullets.erase(shootedBullets.begin() + i);
+	  }
+  }
 }
+
+//
+//wchar_t buffer[256];
+//
+//
+//shootedBullets[i]->time;
+//
+//
+//OutputDebugStringW(buffer);
 
 
 // fill buffer in this function
@@ -99,9 +127,6 @@ void draw()
   }
   if (is_key_pressed(VK_UP)) {
 	  thrusterFlame(10, shipMid);
-  }
-  if (OnButtonDown(VK_SPACE)) {
-	  shoot();
   }
 
   for (auto bullet : shootedBullets) {
@@ -135,13 +160,14 @@ void shoot() {
 	bullet->direction = forwardDir;
 	bullet->position = shipMid;
 	shootedBullets.emplace_back(bullet);
-
-	//delete bullet;
+	
+	//;
 }
 
 // free game data in this function
 void finalize()
 {
+
 }
 
 
@@ -250,7 +276,7 @@ void drawSquare(int size, int pointX, int pointY) {
 			x = clamp(x, 0, SCREEN_HEIGHT);
 			y = clamp(y, 0, SCREEN_WIDTH);
 			try {
-				setPixel(x, y, 0xFF0000);
+				setPixel(x, y, 0xFFFFFF);
 			}
 			catch (...) {
 
