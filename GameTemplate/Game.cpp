@@ -9,6 +9,9 @@
 #include "Vector2.h"
 #include "Bullet.h"
 #include <vector>
+#include <sstream>
+#include "Asteroid.h"
+#include <string>  
 
 //
 //  You are free to modify this file
@@ -34,7 +37,10 @@ void thrusterFlame(int size, Vector2 point);
 void setPixel(int x, int y, uint32_t color);
 void shoot();
 bool OnButtonDown(int button);
-
+void drawAstroids(Vector2 position, float size);
+void spawnAstroids(Vector2 position);
+void drawSquareOutline(Vector2 position, float size);
+float mirror(float value, int min, int max);
 
 float shipX = 0;
 float shipY = 0;
@@ -45,14 +51,27 @@ Vector2 forwardDir = Vector2();
 Vector2 currentforwardDir = Vector2();
 Vector2 shipMid = Vector2();
 vector<Bullet*> shootedBullets = vector<Bullet*>();
+vector<Asteroid*> spawnedAsteroids = vector<Asteroid*>();
 
-
+void DBOut( const int line)
+{
+	std::wostringstream os_;
+	os_ << line ;
+	OutputDebugStringW(os_.str().c_str());
+}
 // initialize game data in this function
 void initialize()
 {
+	srand(time(0));
 	shipY = SCREEN_WIDTH / 2;
 	shipX = SCREEN_HEIGHT / 2;
-	
+	for (int i = 0; i < 5; i++)
+	{
+		spawnAstroids(Vector2(rand()% SCREEN_HEIGHT, rand() % SCREEN_HEIGHT));
+		DBOut(rand()% SCREEN_HEIGHT);
+		//DBOut(rand()% SCREEN_HEIGHT);
+	}
+
 }
 
 
@@ -66,12 +85,12 @@ void act(float dt)
     schedule_quit_game();
   if (is_key_pressed(VK_UP)) {
 	  // forwardDir.normalize();
- 	  currentforwardDir = forwardDir + currentforwardDir;
+	  currentforwardDir = forwardDir + currentforwardDir;
 	  // currentforwardDir.normalize();
 
-	
 
-  } 
+
+  }
   if (is_key_pressed(VK_RIGHT)) {
 
  	  shipAngle -= 5 * dt;
@@ -79,13 +98,14 @@ void act(float dt)
 	  shipAngle += 5 * dt;
   }
   if (OnButtonDown('A')) {
-	//  shoot();
-	  cout << "a";
+	  shoot();
 		
   }
     
   shipX += speed * dt * currentforwardDir.x;
   shipY += speed * dt * currentforwardDir.y;
+  shipX = mirror(shipX, 0, SCREEN_HEIGHT);
+  shipY = mirror(shipY, 0, SCREEN_WIDTH);
 
   for (int i = 0;i< shootedBullets.size(); i++) {
 
@@ -93,24 +113,23 @@ void act(float dt)
 
   		  shootedBullets[i]->time;
 
-		  //delete &shootedBullets[i];
+		  delete shootedBullets[i];
 
-		
-
-		  //shootedBullets.erase(shootedBullets.begin() + i);
+		  shootedBullets.erase(shootedBullets.begin() + i);
 	  }
   }
 }
 
-//
-//wchar_t buffer[256];
-//
-//
-//shootedBullets[i]->time;
-//
-//
-//OutputDebugStringW(buffer);
 
+
+float mirror(float value,int min,int max) {
+	max--;
+	if (value > max)
+		return min + (value - max);
+	else if (value < min)
+		return max + (value + min);
+	return value;
+}
 
 // fill buffer in this function
 // uint32_t buffer[SCREEN_HEIGHT][SCREEN_WIDTH] - is an array of 32-bit colors (8 bits per R, G, B)
@@ -132,12 +151,48 @@ void draw()
   for (auto bullet : shootedBullets) {
 	  bullet->position.x += 0.01 * bullet->direction.x;
 	  bullet->position.y += 0.01 * bullet->direction.y;
+	  bullet->position.x = mirror(bullet->position.x, 0, SCREEN_HEIGHT);;
+	  bullet->position.y = mirror(bullet->position.y, 0, SCREEN_WIDTH);;
 	  drawSquare(5, bullet->direction.x + bullet->position.x, bullet->direction.y + bullet->position.y);
+  }
+  for (auto asteroid : spawnedAsteroids) {
+	  asteroid->position.x += 0.01 * asteroid->direction.x * asteroid->speed;
+	  asteroid->position.y += 0.01 * asteroid->direction.y * asteroid->speed;
+	  asteroid->position.x = mirror(asteroid->position.x, 0, SCREEN_HEIGHT);
+	  asteroid->position.y = mirror(asteroid->position.y, 0, SCREEN_WIDTH);
+	  drawSquareOutline(Vector2(asteroid->direction.x + asteroid->position.x, asteroid->direction.y + asteroid->position.y), 10);
   }
 
 }
 bool previousPress = false;
 bool pressed = false;
+
+void spawnAstroids(Vector2 position) {
+	auto asteroid = new Asteroid();
+	double randomValue =((double)rand()/RAND_MAX) * 2 -1;
+	asteroid->direction = Vector2(randomValue, 1- randomValue);
+	asteroid->position = position;
+	asteroid->speed = rand()%10+1;
+	spawnedAsteroids.emplace_back(asteroid);
+}
+
+void drawAstroids(Vector2 position,float size) {
+
+}
+
+void drawSquareOutline(Vector2 position, float size) {
+	Vector2 leftD = Vector2(position.x - 1* size, position.y - 1 * size);
+	Vector2 rightD = Vector2(position.x + 1 * size, position.y - 1 * size);
+	Vector2 leftU = Vector2(position.x - 1 * size, position.y + 1 * size);
+	Vector2 rightU = Vector2(position.x + 1 * size, position.y + 1 * size);
+
+
+
+	drawline(leftD, rightD, 0xEEEEEE);
+	drawline(rightD, rightU, 0xEEEEEE);
+	drawline(rightU, leftU, 0xEEEEEE);
+	drawline(leftU, leftD, 0xEEEEEE);
+}
 
 bool OnButtonDown(int button)
 {
@@ -160,8 +215,6 @@ void shoot() {
 	bullet->direction = forwardDir;
 	bullet->position = shipMid;
 	shootedBullets.emplace_back(bullet);
-	
-	//;
 }
 
 // free game data in this function
@@ -180,9 +233,27 @@ int clamp(int value, int min, int max) {
 }
 
 void setPixel(int x, int y, uint32_t color) {
-	x = clamp(x, 0, SCREEN_HEIGHT);
-	y = clamp(y, 0, SCREEN_WIDTH);
-	buffer[x][y] = color;
+	x = mirror(x, 0, SCREEN_HEIGHT);
+	y = mirror(y, 0, SCREEN_WIDTH);
+	
+	try {
+		if (x<0 || x>SCREEN_HEIGHT)
+		{
+			DBOut('X');
+			return;
+		}
+		if(y<0 || x>SCREEN_WIDTH)
+		{
+			DBOut('Y');
+			return;
+		}
+
+		buffer[x][y] = color; 
+	}
+	catch (...) {
+
+
+	}
 }
 
 void thrusterFlame(int size, Vector2 point) {
@@ -204,35 +275,35 @@ void thrusterFlame(int size, Vector2 point) {
 	drawline(upper, right, 0xFFFFFF);
 }
 
-void drawTriangle(int size,Vector2 point) {
-//	for (size_t i = 0; i < size; i++)
-//	{
-//		for (size_t j = (size/2)-i/2.5; j < size / 2+i/2.5; j++)
-//		{
-//			int x = i + pointX;
-//			int y = j + pointY;
-//			x = clamp(x, 0, SCREEN_HEIGHT);
-//			y = clamp(y, 0, SCREEN_WIDTH);
-//			buffer[x][y] = 0xFF0000;
-//		}
-//	}
+void drawTriangle(int size, Vector2 point) {
+	//	for (size_t i = 0; i < size; i++)
+	//	{
+	//		for (size_t j = (size/2)-i/2.5; j < size / 2+i/2.5; j++)
+	//		{
+	//			int x = i + pointX;
+	//			int y = j + pointY;
+	//			x = clamp(x, 0, SCREEN_HEIGHT);
+	//			y = clamp(y, 0, SCREEN_WIDTH);
+	//			buffer[x][y] = 0xFF0000;
+	//		}
+	//	}
 
 
-	Vector2 point2 = Vector2(point.x , point.y + 50);
+	Vector2 point2 = Vector2(point.x, point.y + 50);
 
 	Vector2 direction = point2 - point;
 
-	float m =-(direction.x/direction.y);
+	float m = -(direction.x / direction.y);
 
 	float b = m * point.x + point.y;
 
 	Vector2 right = Vector2(6 * size + point.x, 3 * size + point.y);
-	Vector2 left  = Vector2(6 * size + point.x, 1 * size + point.y);
+	Vector2 left = Vector2(6 * size + point.x, 1 * size + point.y);
 	Vector2 upper = Vector2(2 * size + point.x, 2 * size + point.y);
 	shipMid = right + (left - right) / 2;
 
 	right = rotateRound(right, shipMid, shipAngle);
-	  left = rotateRound(left, shipMid, shipAngle);
+	left = rotateRound(left, shipMid, shipAngle);
 	upper = rotateRound(upper, shipMid, shipAngle);
 
 	drawline(left, right, 0xFFFFFF);
@@ -275,12 +346,8 @@ void drawSquare(int size, int pointX, int pointY) {
 			int y = i + pointY - size / 2;
 			x = clamp(x, 0, SCREEN_HEIGHT);
 			y = clamp(y, 0, SCREEN_WIDTH);
-			try {
-				setPixel(x, y, 0xFFFFFF);
-			}
-			catch (...) {
+			setPixel(x, y, 0xFFFFFF);
 
-			}
 
 		}
 	}
@@ -302,7 +369,6 @@ void drawline(Vector2 point, Vector2 point2, uint32_t color)
 
 
 		setPixel((int)round(X), (int)round(Y), color);
-
 		X += Xinc;          
 		Y += Yinc;       
 	}

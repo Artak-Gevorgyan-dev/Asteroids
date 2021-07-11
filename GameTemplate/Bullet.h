@@ -7,6 +7,6 @@ public:
 	Vector2 position;
 	~Bullet();
 	float time;
-	bool needToDestroy(float dt);
+	bool needToDestroy(float &dt);
 };
 
