@@ -3,7 +3,6 @@
 #include <memory.h>
 #include <iostream>
 #include <string>  
-//#include <debugapi.h>
 #include <windows.h>
 #include <math.h>
 #include "Vector2.h"
@@ -11,7 +10,7 @@
 #include <vector>
 #include <sstream>
 #include "Asteroid.h"
-#include <string>  
+#include <ctime>
 
 //
 //  You are free to modify this file
@@ -38,7 +37,7 @@ void setPixel(int x, int y, uint32_t color);
 void shoot();
 bool OnButtonDown(int button);
 void drawAstroids(Vector2 position, float size);
-void spawnAstroids(Vector2 position);
+void spawnAstroids(Vector2 position, float size);
 void drawSquareOutline(Vector2 position, float size);
 float mirror(float value, int min, int max);
 
@@ -67,8 +66,7 @@ void initialize()
 	shipX = SCREEN_HEIGHT / 2;
 	for (int i = 0; i < 5; i++)
 	{
-		spawnAstroids(Vector2(rand()% SCREEN_HEIGHT, rand() % SCREEN_HEIGHT));
-		DBOut(rand()% SCREEN_HEIGHT);
+		spawnAstroids(Vector2(rand()% SCREEN_HEIGHT, rand() % SCREEN_HEIGHT), rand() % 20 +5);
 		//DBOut(rand()% SCREEN_HEIGHT);
 	}
 
@@ -106,7 +104,12 @@ void act(float dt)
   shipY += speed * dt * currentforwardDir.y;
   shipX = mirror(shipX, 0, SCREEN_HEIGHT);
   shipY = mirror(shipY, 0, SCREEN_WIDTH);
-
+  if (spawnedAsteroids.size()==0) {
+	  for (int i = 0; i < 5; i++)
+	  {
+		  spawnAstroids(Vector2(rand() % SCREEN_HEIGHT, rand() % SCREEN_HEIGHT), rand() % 20+10);
+	  }
+  }
   for (int i = 0;i< shootedBullets.size(); i++) {
 
 	  if (shootedBullets[i]->needToDestroy(dt)) {
@@ -116,6 +119,33 @@ void act(float dt)
 		  delete shootedBullets[i];
 
 		  shootedBullets.erase(shootedBullets.begin() + i);
+	  }
+  }
+  for (int i = 0; i < spawnedAsteroids.size(); i++) {
+
+	  for (int j = 0; j < shootedBullets.size(); j++)
+	  {
+		  bool a = shootedBullets[j]->position.x < spawnedAsteroids[i]->position.x + spawnedAsteroids[i]->size ;
+		  bool b = shootedBullets[j]->position.x > spawnedAsteroids[i]->position.x - spawnedAsteroids[i]->size ;
+		  bool c = shootedBullets[j]->position.y < spawnedAsteroids[i]->position.y + spawnedAsteroids[i]->size ;
+		  bool d = shootedBullets[j]->position.y > spawnedAsteroids[i]->position.y - spawnedAsteroids[i]->size ;
+		  if (a && b && c && d) {
+			  
+			  if (spawnedAsteroids[i]->size > 20) {
+				  spawnAstroids(spawnedAsteroids[i]->position, spawnedAsteroids[i]->size-10);
+				  spawnAstroids(spawnedAsteroids[i]->position, spawnedAsteroids[i]->size-10);
+			  }
+
+			  delete spawnedAsteroids[i];
+
+			  spawnedAsteroids.erase(spawnedAsteroids.begin() + i);
+			  
+			  delete shootedBullets[j];
+
+			  shootedBullets.erase(shootedBullets.begin() + j);
+			  break;
+			
+		}
 	  }
   }
 }
@@ -160,19 +190,22 @@ void draw()
 	  asteroid->position.y += 0.01 * asteroid->direction.y * asteroid->speed;
 	  asteroid->position.x = mirror(asteroid->position.x, 0, SCREEN_HEIGHT);
 	  asteroid->position.y = mirror(asteroid->position.y, 0, SCREEN_WIDTH);
-	  drawSquareOutline(Vector2(asteroid->direction.x + asteroid->position.x, asteroid->direction.y + asteroid->position.y), 10);
+	  drawSquareOutline(Vector2(asteroid->direction.x + asteroid->position.x, asteroid->direction.y + asteroid->position.y), asteroid->size);
   }
 
 }
 bool previousPress = false;
 bool pressed = false;
 
-void spawnAstroids(Vector2 position) {
+void spawnAstroids(Vector2 position, float size) {
 	auto asteroid = new Asteroid();
-	double randomValue =((double)rand()/RAND_MAX) * 2 -1;
-	asteroid->direction = Vector2(randomValue, 1- randomValue);
+	double randomValueX =((double)rand()/RAND_MAX) * 2 -1;
+
+	double randomValueY = ((double)rand() / RAND_MAX) * 2 - 1;
+	asteroid->direction = Vector2(randomValueX, randomValueY);
 	asteroid->position = position;
 	asteroid->speed = rand()%10+1;
+	asteroid->size = size;
 	spawnedAsteroids.emplace_back(asteroid);
 }
 
@@ -187,6 +220,7 @@ void drawSquareOutline(Vector2 position, float size) {
 	Vector2 rightU = Vector2(position.x + 1 * size, position.y + 1 * size);
 
 
+	buffer[(int)position.x][(int)position.y] = 0xFF0000 ;
 
 	drawline(leftD, rightD, 0xEEEEEE);
 	drawline(rightD, rightU, 0xEEEEEE);
@@ -235,25 +269,19 @@ int clamp(int value, int min, int max) {
 void setPixel(int x, int y, uint32_t color) {
 	x = mirror(x, 0, SCREEN_HEIGHT);
 	y = mirror(y, 0, SCREEN_WIDTH);
-	
-	try {
-		if (x<0 || x>SCREEN_HEIGHT)
-		{
-			DBOut('X');
-			return;
-		}
-		if(y<0 || x>SCREEN_WIDTH)
-		{
-			DBOut('Y');
-			return;
-		}
 
-		buffer[x][y] = color; 
+	if (x<0 || x>SCREEN_HEIGHT)
+	{
+		DBOut('X');
+		return;
 	}
-	catch (...) {
-
-
+	if (y<0 || x>SCREEN_WIDTH)
+	{
+		DBOut('Y');
+		return;
 	}
+
+	buffer[x][y] = color;
 }
 
 void thrusterFlame(int size, Vector2 point) {
@@ -276,17 +304,17 @@ void thrusterFlame(int size, Vector2 point) {
 }
 
 void drawTriangle(int size, Vector2 point) {
-	//	for (size_t i = 0; i < size; i++)
-	//	{
-	//		for (size_t j = (size/2)-i/2.5; j < size / 2+i/2.5; j++)
-	//		{
-	//			int x = i + pointX;
-	//			int y = j + pointY;
-	//			x = clamp(x, 0, SCREEN_HEIGHT);
-	//			y = clamp(y, 0, SCREEN_WIDTH);
-	//			buffer[x][y] = 0xFF0000;
-	//		}
-	//	}
+		//for (size_t i = 0; i < size; i++)
+		//{
+		//	for (size_t j = (size/2)-i/2.5; j < size / 2+i/2.5; j++)
+		//	{
+		//		int x = i + point.x;
+		//		int y = j + point.y;
+		//		x = clamp(x, 0, SCREEN_HEIGHT);
+		//		y = clamp(y, 0, SCREEN_WIDTH);
+		//		buffer[x][y] = 0xFF0000;
+		//	}
+		//}
 
 
 	Vector2 point2 = Vector2(point.x, point.y + 50);
