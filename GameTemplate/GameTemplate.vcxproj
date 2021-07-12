@@ -155,6 +155,9 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Vector2.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Font Include="C:\Users\garta\Desktop\font.TTF" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

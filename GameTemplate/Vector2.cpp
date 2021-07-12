@@ -33,4 +33,10 @@ void Vector2::normalize()
 	this->x = this->x / lenght;
 	this->y = this->y / lenght;
 }
+float Vector2::lenght()
+{
+	float lenght = sqrt(this->x * this->x + this->y * this->y);
+	return lenght;
+}
+
 
